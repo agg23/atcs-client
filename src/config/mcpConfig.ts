@@ -71,7 +71,7 @@ const parseMCPEntry = (
   index: number
 ): ATCSMcpDef => {
   const keys = availableKeys.filter(
-    ({ index: keyIndex }) => keyIndex - 1 === index
+    ({ index: keyIndex }) => keyIndex === index
   );
 
   const map: Record<string, string> = {};
@@ -88,12 +88,12 @@ const parseMCPEntry = (
     milepost,
     controlMessageNo,
     controlBits,
-    controlMnemonics,
+    controlMnemonics = "",
     indicationMessageNo,
     indicationBits,
-    indicationMnemonics,
+    indicationMnemonics = "",
     updated,
-    protocol,
+    protocol = "ATCS",
     ...other
   } = map;
 
@@ -102,35 +102,37 @@ const parseMCPEntry = (
     !name ||
     !controlMessageNo ||
     !controlBits ||
-    !controlMnemonics ||
     !indicationMessageNo ||
-    !indicationBits ||
-    !indicationMnemonics ||
-    !protocol
+    !indicationBits
   ) {
     throw new Error(
       `MCP def is missing information. Available keys: ${keys
-        .filter(({ index: keyIndex }) => keyIndex - 1 === index)
-        .map(({ field }) => field)}`
+        .filter(({ index: keyIndex }) => keyIndex === index)
+        .map(({ field }) => field)
+        .join(", ")}, Present: ${JSON.stringify(map)}`
     );
   }
 
   const parsedControlBitLength = parseInt(controlBits, 10);
-  const parsedControlMnemonics = controlMnemonics.split(",");
+  let parsedControlMnemonics = controlMnemonics.split(",");
 
-  if (parsedControlMnemonics.length !== parsedControlBitLength) {
-    throw new Error(
-      `Mismatched config control lengths, ${parsedControlBitLength} vs ${parsedControlMnemonics.length}`
-    );
+  if (parsedControlMnemonics.length < parsedControlBitLength) {
+    parsedControlMnemonics = [
+      ...Array(parsedControlBitLength - parsedControlMnemonics.length).fill(""),
+      ...parsedControlMnemonics,
+    ];
   }
 
   const parsedIndicationBitLength = parseInt(indicationBits, 10);
-  const parsedIndicationMnemonics = indicationMnemonics.split(",");
+  let parsedIndicationMnemonics = indicationMnemonics.split(",");
 
-  if (parsedIndicationMnemonics.length !== parsedIndicationBitLength) {
-    throw new Error(
-      `Mismatched config indication lengths, ${parsedIndicationBitLength} vs ${parsedIndicationMnemonics.length}`
-    );
+  if (parsedIndicationMnemonics.length < parsedIndicationBitLength) {
+    parsedIndicationMnemonics = [
+      ...Array(
+        parsedIndicationBitLength - parsedIndicationMnemonics.length
+      ).fill(""),
+      ...parsedIndicationMnemonics,
+    ];
   }
 
   return {
