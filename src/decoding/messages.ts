@@ -6,6 +6,17 @@ interface ATCSMessageBase {
   friendlyName: string;
 }
 
+type ATCSMnemonics =
+  | {
+      type: "unknown";
+      activeIndexes: number[];
+    }
+  | {
+      type: "mcp";
+      mnemonics: string[];
+      activeIndexes: number[];
+    };
+
 export interface ATCSCodelineIndication extends ATCSMessageBase {
   type: "4747";
 
@@ -16,7 +27,7 @@ export interface ATCSCodelineIndication extends ATCSMessageBase {
   timestamp: number;
   length: number;
   lastByteBitCount: number;
-  activeIndexes: number[];
+  mnemonics: ATCSMnemonics;
 }
 
 export interface ATCSCodelineControl extends ATCSMessageBase {
@@ -30,7 +41,7 @@ export interface ATCSCodelineControl extends ATCSMessageBase {
   timestamp: number;
   length: number;
   lastByteBitCount: number;
-  activeIndexes: number[];
+  mnemonics: ATCSMnemonics;
 }
 
 export type ATCSMessage = ATCSCodelineIndication | ATCSCodelineControl;

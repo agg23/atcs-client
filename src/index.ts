@@ -3,8 +3,6 @@ import { atcsDecode } from "./decoding/atcsDecoder";
 
 const mcps = parseMCPIni("BNSF_Belen_Area-20210309.mcp");
 
-console.log(mcps);
-
 const packet0 = new Uint8Array([
   0x23,
   0x14,
@@ -45,6 +43,6 @@ const packet0 = new Uint8Array([
 
 // Ignore first 4 bytes and last 2 (TODO: not sure why)
 // +1 for ATCSmon type bit
-const result = atcsDecode(packet0.slice(5));
+const result = atcsDecode(packet0.slice(5), mcps);
 
 console.log(JSON.stringify(result));

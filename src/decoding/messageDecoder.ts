@@ -1,9 +1,13 @@
+import { ATCSMcpDef } from "../config/mcp";
 import { getBCDNumber, getSetBitPositions } from "../util/bit";
 import { ATCSMessage } from "./messages";
 
 import messages from "./messages.json";
 
-export const decodeMessage = (input: Uint8Array): ATCSMessage => {
+export const decodeMessage = (
+  input: Uint8Array,
+  mcp?: ATCSMcpDef
+): ATCSMessage => {
   const type = `${Buffer.from(input.slice(0, 2)).readUInt16BE(0)}`;
 
   if (!isKnownMessageType(type)) {
@@ -31,6 +35,8 @@ export const decodeMessage = (input: Uint8Array): ATCSMessage => {
 
       const dataBytes = input.slice(7, 7 + length);
 
+      const activeIndexes = getSetBitPositions(dataBytes);
+
       return {
         ...messageInfo,
         type: "4609",
@@ -39,7 +45,19 @@ export const decodeMessage = (input: Uint8Array): ATCSMessage => {
         timestamp: input[4]!,
         length,
         lastByteBitCount: input[6]!,
-        activeIndexes: getSetBitPositions(dataBytes),
+        mnemonics: mcp
+          ? {
+              type: "mcp",
+              activeIndexes,
+              mnemonics: indexesToMnemonics(
+                activeIndexes,
+                mcp.controlMnemonics
+              ),
+            }
+          : {
+              type: "unknown",
+              activeIndexes,
+            },
       };
     }
     case "4747": {
@@ -55,6 +73,8 @@ export const decodeMessage = (input: Uint8Array): ATCSMessage => {
 
       const dataBytes = input.slice(6, 6 + length);
 
+      const activeIndexes = getSetBitPositions(dataBytes);
+
       return {
         ...messageInfo,
         type: "4747",
@@ -62,7 +82,19 @@ export const decodeMessage = (input: Uint8Array): ATCSMessage => {
         timestamp: input[3]!,
         length,
         lastByteBitCount: input[5]!,
-        activeIndexes: getSetBitPositions(dataBytes),
+        mnemonics: mcp
+          ? {
+              type: "mcp",
+              activeIndexes,
+              mnemonics: indexesToMnemonics(
+                activeIndexes,
+                mcp.indicationMnemonics
+              ),
+            }
+          : {
+              type: "unknown",
+              activeIndexes,
+            },
       };
     }
   }
@@ -70,3 +102,6 @@ export const decodeMessage = (input: Uint8Array): ATCSMessage => {
 
 const isKnownMessageType = (type: string): type is keyof typeof messages =>
   type in messages;
+
+const indexesToMnemonics = (indexes: number[], mnemonics: string[]): string[] =>
+  indexes.map((i) => mnemonics[mnemonics.length - i - 1]!).filter((s) => !!s);

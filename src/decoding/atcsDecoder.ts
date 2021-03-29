@@ -7,8 +7,12 @@ import {
 } from "../util/bit";
 import { decodeMessage } from "./messageDecoder";
 import { ATCSMessage } from "./messages";
+import { ATCSMcpDef } from "../config/mcp";
 
-export const atcsDecode = (input: Uint8Array): ATCSPacket<ATCSMessage> => {
+export const atcsDecode = (
+  input: Uint8Array,
+  mcps: Record<string, ATCSMcpDef>
+): ATCSPacket<ATCSMessage> => {
   // Ignore first 4 bytes and last 2 (TODO: not sure why)
   const firstValue = input[0]!;
 
@@ -45,7 +49,9 @@ export const atcsDecode = (input: Uint8Array): ATCSPacket<ATCSMessage> => {
   const messageLength = extractBits(input[index + 2]!, 1, 7);
   const containsCRC = testBit(input[index + 2]!, 0);
 
-  const message = decodeMessage(input.slice(index + 3));
+  const mcpSource = mcps[`${source.value}`];
+
+  const message = decodeMessage(input.slice(index + 3), mcpSource);
 
   const packet: ATCSPacket<ATCSMessage> = {
     isAck,
