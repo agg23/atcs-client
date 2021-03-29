@@ -1,0 +1,50 @@
+import { parseMCPIni } from "./config/mcpConfig";
+import { atcsDecode } from "./decoding/atcsDecoder";
+
+const mcps = parseMCPIni("BNSF_Belen_Area-20210309.mcp");
+
+console.log(mcps);
+
+const packet0 = new Uint8Array([
+  0x23,
+  0x14,
+  0x05,
+  0xcf,
+  0x8f,
+  0x60,
+  0x00,
+  0x20,
+  0x00,
+  0xea,
+  0x2a,
+  0xa1,
+  0x16,
+  0x54,
+  0x21,
+  0x7a,
+  0xa1,
+  0x42,
+  0x1a,
+  0xa8,
+  0xa2,
+  0xa2,
+  0x00,
+  0xe0,
+  0x02,
+  0x02,
+  0x12,
+  0x8b,
+  0x03,
+  0x00,
+  0x01,
+  0x08,
+  0x19,
+  0xa1,
+  0x68,
+]);
+
+// Ignore first 4 bytes and last 2 (TODO: not sure why)
+// +1 for ATCSmon type bit
+const result = atcsDecode(packet0.slice(5));
+
+console.log(JSON.stringify(result));

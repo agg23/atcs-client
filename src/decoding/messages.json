@@ -1,0 +1,27 @@
+{
+  "4747": {
+    "specId": "9.2.11",
+    "friendlyName": "CODELINE_INDICATION_MSG",
+    "description": "This message is sent by a remote station to a control machine for updating the status of each remotely controlled location.",
+    "schema": {
+      "revision": "byte = 3",
+      "timestamp": "TIME_DATE (unused?)",
+      "length": "byte",
+      "lastByteBitCount": "byte",
+      "data": "byte[length]"
+    }
+  },
+  "4609": {
+    "specId": "9.0.1",
+    "friendlyName": "CODELINE_CONTROL_MSG",
+    "description": "This message is sent by a control machine to a remote station as a control command. For codeline suppression, the address contained in the CODELINE_INFORMATION should be the broadcast address.",
+    "schema": {
+      "revision": "byte = 3",
+      "address": "CODELINE_ADDRESS?",
+      "timestamp": "TIME_DATE (unused?)",
+      "length": "byte",
+      "lastByteBitCount": "byte",
+      "data": "byte[length]"
+    }
+  }
+}
