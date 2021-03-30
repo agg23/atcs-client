@@ -1,7 +1,7 @@
 import { parseMCPIni } from "./config/mcpConfig";
 import { atcsDecode } from "./decoding/atcsDecoder";
 
-const mcps = parseMCPIni("BNSF_Belen_Area-20210309.mcp");
+const mcps = parseMCPIni("../../ignore/BNSF_Belen_Area-20210309.mcp");
 
 const packet0 = new Uint8Array([
   0x23,
