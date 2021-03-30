@@ -1,5 +1,5 @@
 {
-  "name": "@atcs/atcs-client",
+  "name": "@atcs/decoder",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",

@@ -8,6 +8,9 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "yarn --cwd packages/atcs-client start"
+    "decode": "yarn --cwd packages/decoder start"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
   }
 }
