@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.ts",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
   "scripts": {
     "decode": "yarn --cwd packages/decoder start"
   },

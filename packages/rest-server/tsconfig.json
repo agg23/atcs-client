@@ -10,8 +10,6 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "noUncheckedIndexedAccess": true,
-    "declaration": true,
-    "outDir": "dist"
+    "noUncheckedIndexedAccess": true
   },
 }
