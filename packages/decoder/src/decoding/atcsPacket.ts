@@ -83,6 +83,40 @@ export type ATCSAddress = {
 } & (
   | {
       /**
+       * Host computer node
+       */
+      type: "2";
+
+      /**
+       * Two digit network node ID
+       */
+      node: number;
+
+      /**
+       * Four digit addressed device ID
+       *
+       * These IDs are namespaced @see MSRP K-II, Appendix T, 4.2/3
+       */
+      device: number;
+    }
+  | {
+      /**
+       * Wayside MCP node
+       */
+      type: "5";
+
+      /**
+       * Two digit separator for a given MCP
+       */
+      extension: number;
+
+      /**
+       * Four digit internal ID
+       */
+      internal: number;
+    }
+  | {
+      /**
        * Standard MCP node
        */
       type: "7";
@@ -105,23 +139,5 @@ export type ATCSAddress = {
        * Two digit internal ID within the equipment
        */
       internal: number;
-    }
-  | {
-      /**
-       * Host computer node
-       */
-      type: "2";
-
-      /**
-       * Two digit network node ID
-       */
-      node: number;
-
-      /**
-       * Four digit addressed device ID
-       *
-       * These IDs are namespaced @see MSRP K-II, Appendix T, 4.2/3
-       */
-      device: number;
     }
 );

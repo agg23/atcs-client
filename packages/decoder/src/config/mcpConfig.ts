@@ -1,6 +1,6 @@
 import { parse } from "ini";
 import { readFileSync } from "fs";
-import { ATCSMcpDef } from "./mcp";
+import { ATCSMcpDef, ATCSMcpInterfaceDef } from "./mcp";
 import { lowercaseFirst } from "../util/string";
 import { buildAddress } from "../decoding/atcsDecoder";
 import { toNibbleBCDNumber } from "../util/bit";
@@ -97,14 +97,7 @@ const parseMCPEntry = (
     ...other
   } = map;
 
-  if (
-    !address ||
-    !name ||
-    !controlMessageNo ||
-    !controlBits ||
-    !indicationMessageNo ||
-    !indicationBits
-  ) {
+  if (!address || !name) {
     throw new Error(
       `MCP def is missing information. Available keys: ${keys
         .filter(({ index: keyIndex }) => keyIndex === index)
@@ -113,26 +106,51 @@ const parseMCPEntry = (
     );
   }
 
-  const parsedControlBitLength = parseInt(controlBits, 10);
-  let parsedControlMnemonics = controlMnemonics.split(",");
+  const hasControl = !!controlMessageNo && !!controlBits;
+  const hasIndication = !!indicationMessageNo && !!indicationBits;
 
-  if (parsedControlMnemonics.length < parsedControlBitLength) {
-    parsedControlMnemonics = [
-      ...Array(parsedControlBitLength - parsedControlMnemonics.length).fill(""),
-      ...parsedControlMnemonics,
-    ];
+  if (!hasControl && !hasIndication) {
+    throw new Error("MCP def has neither control or indictation bits");
   }
 
-  const parsedIndicationBitLength = parseInt(indicationBits, 10);
-  let parsedIndicationMnemonics = indicationMnemonics.split(",");
+  let controlDef: ATCSMcpInterfaceDef | undefined = undefined;
 
-  if (parsedIndicationMnemonics.length < parsedIndicationBitLength) {
-    parsedIndicationMnemonics = [
-      ...Array(
-        parsedIndicationBitLength - parsedIndicationMnemonics.length
-      ).fill(""),
-      ...parsedIndicationMnemonics,
-    ];
+  if (!!controlMessageNo && !!controlBits) {
+    const bitLength = parseInt(controlBits, 10);
+    let mnemonics = controlMnemonics.split(",");
+
+    if (mnemonics.length < bitLength) {
+      mnemonics = [
+        ...Array(bitLength - mnemonics.length).fill(""),
+        ...mnemonics,
+      ];
+    }
+
+    controlDef = {
+      bitLength,
+      messageType: controlMessageNo,
+      mnemonics,
+    };
+  }
+
+  let indicationDef: ATCSMcpInterfaceDef | undefined = undefined;
+
+  if (!!indicationMessageNo && !!indicationBits) {
+    const bitLength = parseInt(indicationBits, 10);
+    let mnemonics = indicationMnemonics.split(",");
+
+    if (mnemonics.length < bitLength) {
+      mnemonics = [
+        ...Array(bitLength - mnemonics.length).fill(""),
+        ...mnemonics,
+      ];
+    }
+
+    indicationDef = {
+      bitLength,
+      messageType: indicationMessageNo,
+      mnemonics,
+    };
   }
 
   return {
@@ -140,12 +158,16 @@ const parseMCPEntry = (
     protocol,
     name,
     milepost: milepost ? parseFloat(milepost) : undefined,
-    controlMessageType: controlMessageNo,
-    controlBitLength: parsedControlBitLength,
-    controlMnemonics: parsedControlMnemonics,
-    indicationMessageType: indicationMessageNo,
-    indicationBitLength: parsedIndicationBitLength,
-    indicationMnemonics: parsedIndicationMnemonics,
+    interface: {
+      type: !!controlDef
+        ? !!indicationDef
+          ? "both"
+          : "control"
+        : "indication",
+      // Cast due to error check above
+      control: controlDef as ATCSMcpInterfaceDef,
+      indication: indicationDef as ATCSMcpInterfaceDef,
+    },
     updated,
     other,
   };

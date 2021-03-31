@@ -45,19 +45,21 @@ export const decodeMessage = (
         timestamp: input[4]!,
         length,
         lastByteBitCount: input[6]!,
-        mnemonics: mcp
-          ? {
-              type: "mcp",
-              activeIndexes,
-              mnemonics: indexesToMnemonics(
+        mnemonics:
+          mcp &&
+          (mcp.interface.type === "control" || mcp.interface.type === "both")
+            ? {
+                type: "mcp",
                 activeIndexes,
-                mcp.controlMnemonics
-              ),
-            }
-          : {
-              type: "unknown",
-              activeIndexes,
-            },
+                mnemonics: indexesToMnemonics(
+                  activeIndexes,
+                  mcp.interface.control.mnemonics
+                ),
+              }
+            : {
+                type: "unknown",
+                activeIndexes,
+              },
       };
     }
     case "4747": {
@@ -82,19 +84,21 @@ export const decodeMessage = (
         timestamp: input[3]!,
         length,
         lastByteBitCount: input[5]!,
-        mnemonics: mcp
-          ? {
-              type: "mcp",
-              activeIndexes,
-              mnemonics: indexesToMnemonics(
+        mnemonics:
+          mcp &&
+          (mcp.interface.type === "indication" || mcp.interface.type === "both")
+            ? {
+                type: "mcp",
                 activeIndexes,
-                mcp.indicationMnemonics
-              ),
-            }
-          : {
-              type: "unknown",
-              activeIndexes,
-            },
+                mnemonics: indexesToMnemonics(
+                  activeIndexes,
+                  mcp.interface.indication.mnemonics
+                ),
+              }
+            : {
+                type: "unknown",
+                activeIndexes,
+              },
       };
     }
   }

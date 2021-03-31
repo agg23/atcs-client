@@ -1,19 +1,32 @@
 import { ATCSAddress } from "../decoding/atcsPacket";
 
-export interface ATCSMcpDef {
+export interface ATCSMcpInterfaceDef {
+  messageType: string;
+  bitLength: number;
+  mnemonics: string[];
+}
+
+export type ATCSMcpDef = {
   address: ATCSAddress;
   name: string;
   milepost?: number;
   protocol: string;
   updated?: string;
 
-  controlMessageType: string;
-  controlBitLength: number;
-  controlMnemonics: string[];
-
-  indicationMessageType: string;
-  indicationBitLength: number;
-  indicationMnemonics: string[];
+  interface:
+    | {
+        type: "control";
+        control: ATCSMcpInterfaceDef;
+      }
+    | {
+        type: "indication";
+        indication: ATCSMcpInterfaceDef;
+      }
+    | {
+        type: "both";
+        control: ATCSMcpInterfaceDef;
+        indication: ATCSMcpInterfaceDef;
+      };
 
   other?: { [key: string]: string };
-}
+};

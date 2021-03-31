@@ -84,6 +84,8 @@ export const buildAddress = (input: Uint8Array): ATCSAddress => {
   switch (type) {
     case 2:
       return buildHostComputer2Address(input);
+    case 5:
+      return buildMCP5Address(input);
     case 7:
       return buildMCP7Address(input);
     default: {
@@ -92,6 +94,36 @@ export const buildAddress = (input: Uint8Array): ATCSAddress => {
       );
     }
   }
+};
+
+const buildHostComputer2Address = (input: Uint8Array): ATCSAddress => {
+  const value = getNibbleBCDNumber(input);
+  const railroad = getBCDNumber(input.slice(1, 4));
+  const node = getBCDNumber(input.slice(4, 6));
+  const device = getBCDNumber(input.slice(6, 10));
+
+  return {
+    type: "2",
+    value,
+    railroad,
+    node,
+    device,
+  };
+};
+
+const buildMCP5Address = (input: Uint8Array): ATCSAddress => {
+  const value = getNibbleBCDNumber(input);
+  const railroad = getBCDNumber(input.slice(1, 4));
+  const extension = getBCDNumber(input.slice(4, 6));
+  const internal = getBCDNumber(input.slice(6, 10));
+
+  return {
+    type: "5",
+    value,
+    railroad,
+    extension,
+    internal,
+  };
 };
 
 const buildMCP7Address = (input: Uint8Array): ATCSAddress => {
@@ -110,20 +142,5 @@ const buildMCP7Address = (input: Uint8Array): ATCSAddress => {
     control,
     equipment,
     internal,
-  };
-};
-
-const buildHostComputer2Address = (input: Uint8Array): ATCSAddress => {
-  const value = getNibbleBCDNumber(input);
-  const railroad = getBCDNumber(input.slice(1, 4));
-  const node = getBCDNumber(input.slice(4, 6));
-  const device = getBCDNumber(input.slice(6, 10));
-
-  return {
-    type: "2",
-    value,
-    railroad,
-    node,
-    device,
   };
 };
